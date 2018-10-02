@@ -1,0 +1,255 @@
+# Efficient random splits in labelled trees #
+
+During an implemenation of genetic programming over decision trees, I encountered an interesting
+problem: how to implementa a purely functional way of randomly splitting trees?  By that, I mean a
+function `randomsplit`, such that `randomsplit(f, t)` returns a tuple `(t′, s)`, where `s` is a
+random subtree of `t`, and `t′` is `t` with `s` replaced by `f(s)` (i.e., the “new” tree and the old
+subtree).
+
+
+## Preparations ##
+
+Assume we have the following definition of binary trees, with labelled leaves:
+
+```julia
+abstract type Tree{N} end
+
+struct Leaf{N} <: Tree{N}
+    label::Int
+    
+    Leaf{N}(n) where N = (1 <= n <= N) ? new{N}(n) : error("Illegal construction")
+end
+
+struct Branch{N} <: Tree{N}
+    left::Tree{N}
+    right::Tree{N}
+end
+```
+
+The type parameter `N` constrains the range of labels (for the decision trees, `N` was the number of
+decision variables).
+
+First, some pretty printing function for this kind of tree:
+
+```{julia; results = "hidden"}
+import Base: show
+
+function show(io::IO, l::Leaf, indent = 0)
+    print(io, " " ^ indent, "Leaf($(l.label))")
+end
+
+function show(io::IO, b::Branch, indent = 0)
+    print(io, " " ^ indent)
+    print(io, "Branch(\n")
+    show(io, b.left, indent + 2)
+    print(io, ",\n")
+    show(io, b.right, indent + 2)
+    print(io, ")")
+end
+```
+
+Now we can look at some examples:
+
+```julia
+const t = Branch{4}(Branch{4}(Leaf{4}(1), Leaf{4}(2)), Leaf{4}(4))
+```
+
+```julia
+const t2 = Branch{4}(Leaf{4}(1), Leaf{4}(2))
+```
+
+
+## Naive splitting ##
+
+The idea to select and change a random sub-tree is to use [reservoir
+sampling](https://stackoverflow.com/a/3272490/1346276) of continuations.  That is, we iterate over
+all nodes in the tree, and at each $n$th node, select with probability $1/n$ a function which knows
+how to change the current node (and return the original).  In the example `t2` from above, this
+would in principle be the following functions:
+
+```{julia; eval = false}
+k -> (Branch(k(Leaf(1)), Leaf(2)), Leaf(1))
+k -> (Branch(Leaf(1), k(Leaf(2))), Leaf(2))
+k -> (k(Branch(Leaf(1), Leaf(2))), Branch(Leaf(1), Leaf(2)))
+```
+
+We call this function the “continuation” at the node.  To efficiently preserve the knowledge about
+tree structure while recursively traversing it, we also remember at each step the “context” – a
+function building up the tree to the current point.  The contexts of `t2` are
+
+```{julia; eval = false}
+t -> Branch(t, Leaf(2))
+t -> Branch(Leaf(1), t)
+t -> t
+```
+
+Now the continuation at each node `t`, given `context`, can locally be defined as
+
+```{julia; eval = false}
+k -> (context(k(t)), t)
+```
+
+The following functions implement this technique, using anonymous functions for contexts and
+continuations:
+
+```{julia; results = "hidden"}
+function randomsplitnaive_impl(l::Leaf, n, context, continuation)
+    n += 1
+    if rand() ≤ 1/n
+        continuation = k -> (context(k(l)), l)
+    end
+
+    return continuation, n
+end
+
+function randomsplitnaive_impl(b::Branch, n, context, continuation)
+    continuation, n = randomsplitnaive_impl(b.left, 
+                                            n,
+                                            t -> context(Branch(t, b.right)),
+                                            continuation)
+    continuation, n = randomsplitnaive_impl(b.right, 
+                                            n,
+                                            t -> context(Branch(b.left, t)),
+                                            continuation)
+
+    n += 1
+    if rand() ≤ 1/n
+        continuation = k -> (context(k(b)), b)
+    end
+    
+    return continuation, n
+end
+```
+
+With these internal implementations, we can define the following function for the user, which works
+by calling the sampled continuation on a provided `action`:
+
+
+```{julia; results = "hidden"}
+"""
+    randomsplitnaive(action, t::Tree)
+Select uniformly at random a subtree `s` of `t`, then replace `s` by `action(s)`. 
+Returns both the new tree and the replaced subtree.
+"""
+function randomsplitnaive(action, t::Tree)
+    # The continuation argument will be assigned a default with probability 1 on the first leaf,
+    # so passing `nothing` is safe here.
+    cont, _ = randomsplitnaive_impl(t, 0, identity, nothing)
+    cont(action)
+end
+```
+
+Given this, we can define a trivial variant ignoring the substitution and just returning the (now
+randomly sampled) subtree:
+
+```{julia; results = "hidden"}
+randomchildnaive(t::Tree) = randomsplitnaive(identity, t)[2]
+```
+
+
+To test for a uniform distribution of splits, we use some hackish “hashing” by summation: we sum the
+the labels of the tree, and based on that, create a histogram of the resulting numbers:
+
+```julia
+sumtree(t::Leaf) = t.label
+sumtree(t::Branch) = sumtree(t.left) + sumtree(t.right)
+
+function testvalues_native(t, N)
+    zd = [sumtree(randomchildnaive(t)) for _ in 1:N]
+    [(i, sum(zd .== i)) for i in unique(zd)]
+end
+
+testvalues_native(t, 1000)
+```
+
+As can be seen, the distribution is pretty uniform.
+
+
+## Optimizing the implementation ##
+
+
+```julia
+abstract type Context{N} end
+
+
+struct LeftContext{N} <: Context{N}
+    right::Tree{N}
+    parent::Context{N}
+end
+
+function (context::LeftContext{N})(t::Tree{N}) where N
+    context.parent(Branch(t, context.right))
+end
+
+
+struct RightContext{N} <: Context{N}
+    left::Tree{N}
+    parent::Context{N}
+end
+
+function (context::RightContext{N})(t::Tree{N}) where N
+    context.parent(Branch(context.left, t))
+end
+
+
+struct NoContext{N} <: Context{N} end
+    
+function (context::NoContext{N})(t::Tree{N}) where N
+    t
+end
+```
+
+```julia
+struct Cont{N}
+    context::Context{N}
+    chunk::Tree{N}
+end
+
+function (continuation::Cont{N})(k::Function) where N
+    newchunk = k(continuation.chunk)::Tree{N}
+    tree = continuation.context(newchunk)::Tree{N}
+    return tree, continuation.chunk
+end
+```
+
+```julia
+function randomsplit_impl(t::Leaf{N}, n::Int, context::Context{N}, continuation::Cont{N}) where {N}
+    n += 1
+    if rand() ≤ 1/n
+        return Cont{N}(context, t), n
+    else
+        return continuation, n
+    end
+end
+
+function randomsplit_impl(t::Branch{N}, n::Int, context::Context{N}, continuation::Cont{N}) where {N}
+    c1, n = randomsplit_impl(t.left, n, LeftContext{N}(t.right, context), continuation)
+    c2, n = randomsplit_impl(t.right, n, RightContext{N}(t.left, context), c1)
+    
+    n += 1
+    if rand() ≤ 1/n
+        return Cont{N}(context, t), n
+    else
+        return c2, n
+    end
+end
+
+function randomsplit(action, t::Tree{N}) where {N}
+    default_context = NoContext{N}()
+    cont, _ = randomsplit_impl(t, 0, default_context, Cont{N}(default_context, t))
+    cont(action)
+end
+
+randomchild(t::Tree{N}) where {N} = randomsplit(identity, t)[2]
+```
+
+```julia
+function testvalues(t, N)
+    zd = [sumtree(randomchild(t)) for _ in 1:N]
+    [(i, sum(zd .== i)) for i in unique(zd)]
+end
+
+testvalues(t, 1000)
+```
+
+

@@ -1,0 +1,7 @@
+name = "TreeSplitting"
+uuid = "9e998ed2-c615-11e8-1285-094b572fb69a"
+authors = ["Philipp Gabler <phipsgabler@users.noreply.github.com>"]
+version = "0.1.0"
+
+[deps]
+Weave = "44d3d7a6-8a23-5bf8-98c5-b353f8df5ec9"
