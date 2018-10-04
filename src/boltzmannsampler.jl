@@ -1,13 +1,13 @@
 import Base: rand
-using Random: AbstractRNG
+using Random: AbstractRNG, Sampler, SamplerType
 
-rand(rng::AbstractRNG, ::Type{Leaf{N}}) where {N} = Leaf{N}(rand(rng, 1:N))
+rand(rng::AbstractRNG, ::SamplerType{Leaf{N}}) where {N} = Leaf{N}(rand(rng, 1:N))
 
 """
     BoltzmannSampler{N}(m, n)
 Configuration for Boltzmann sampling `DecisionTree{N}`s with minimum size `m` and maximum size `n`.
 """
-struct BoltzmannSampler{N}
+struct BoltzmannSampler{N} <: Sampler{Tree{N}}
     minsize::Int
     maxsize::Int
 end
