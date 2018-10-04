@@ -50,14 +50,69 @@ end
 
 Now we can look at some examples:
 
-```julia
+```{julia; tangle = false}
 const t = Branch{4}(Branch{4}(Leaf{4}(1), Leaf{4}(2)), Leaf{4}(4))
 ```
 
-```julia
+```{julia; tangle = false}
 const t2 = Branch{4}(Leaf{4}(1), Leaf{4}(2))
 ```
 
+I also [implemented](boltzmannsampler.jl) sampling of random trees using a [Boltzmann
+sampler](https://byorgey.wordpress.com/2013/04/25/random-binary-trees-with-a-size-limited-critical-boltzmann-sampler-2/),
+which generates trees of an expected size in a certain range.
+
+```{julia; echo = false; results = "hidden"}
+import Base: rand
+using Random: AbstractRNG
+
+rand(rng::AbstractRNG, ::Type{Leaf{N}}) where {N} = Leaf{N}(rand(rng, 1:N))
+
+"""
+    BoltzmannSampler{N}(m, n)
+Configuration for Boltzmann sampling `DecisionTree{N}`s with minimum size `m` and maximum size `n`.
+"""
+struct BoltzmannSampler{N}
+    minsize::Int
+    maxsize::Int
+end
+
+function boltzmann_ub(rng::AbstractRNG, sampler::BoltzmannSampler{N}, cursize) where {N}
+    minsize = sampler.minsize
+    maxsize = sampler.maxsize
+
+    if cursize ≥ maxsize        # maximum bound exceeded
+        return nothing, cursize
+    elseif rand(rng) ≤ 0.5      # generate random leaf
+        return rand(rng, Leaf{N}), cursize
+    else                        # try generating a branch -- if its size is small enough
+        # try generating children, or immediately fail
+        left_children, cursize = boltzmann_ub(rng, sampler, cursize + 1)
+        left_children === nothing && return nothing, cursize
+
+        right_children, cursize = boltzmann_ub(rng, sampler, cursize + 1)
+        right_children === nothing && return nothing, cursize
+
+        # `cursize` is now the size of the whole thing, and less than maxsize
+        return Branch{N}(left_children, right_children), cursize        
+    end
+end
+
+function rand(rng::AbstractRNG, sampler::BoltzmannSampler{N}) where {N}
+    candidate, size = boltzmann_ub(rng, sampler, 0)
+    while candidate === nothing || size ≤ sampler.minsize
+        candidate, size = boltzmann_ub(rng, sampler, 0)
+    end
+
+    return candidate
+end
+
+```
+
+```{julia; tangle = false}
+tlarge = rand(BoltzmannSampler{4}(10, 20))
+println(tlarge)
+```
 
 ## Naive splitting ##
 
@@ -67,7 +122,7 @@ all nodes in the tree, and at each $n$th node, select with probability $1/n$ a f
 how to change the current node (and return the original).  In the example `t2` from above, this
 would in principle be the following functions:
 
-```{julia; eval = false}
+```{julia; eval = false; tangle = false}
 k -> (Branch(k(Leaf(1)), Leaf(2)), Leaf(1))
 k -> (Branch(Leaf(1), k(Leaf(2))), Leaf(2))
 k -> (k(Branch(Leaf(1), Leaf(2))), Branch(Leaf(1), Leaf(2)))
@@ -77,7 +132,7 @@ We call this function the “continuation” at the node.  To efficiently preser
 tree structure while recursively traversing it, we also remember at each step the “context” – a
 function building up the tree to the current point.  The contexts of `t2` are
 
-```{julia; eval = false}
+```{julia; eval = false; tangle = false}
 t -> Branch(t, Leaf(2))
 t -> Branch(Leaf(1), t)
 t -> t
@@ -85,7 +140,7 @@ t -> t
 
 Now the continuation at each node `t`, given `context`, can locally be defined as
 
-```{julia; eval = false}
+```{julia; eval = false; tangle = false}
 k -> (context(k(t)), t)
 ```
 
@@ -146,6 +201,9 @@ randomly sampled) subtree:
 randomchildnaive(t::Tree) = randomsplitnaive(identity, t)[2]
 ```
 
+```{julia; tangle = false}
+[randomchildnaive(tlarge) for _ in 1:10]
+```
 
 To test for a uniform distribution of splits, we use some hackish “hashing” by summation: we sum the
 the labels of the tree, and based on that, create a histogram of the resulting numbers:
@@ -158,7 +216,9 @@ function testvalues_native(t, N)
     zd = [sumtree(randomchildnaive(t)) for _ in 1:N]
     [(i, sum(zd .== i)) for i in unique(zd)]
 end
+```
 
+```{julia; tangle = false}
 testvalues_native(t, 1000)
 ```
 
@@ -167,6 +227,31 @@ As can be seen, the distribution is pretty uniform.
 
 ## Optimizing the implementation ##
 
+### Diagnose ###
+
+The above works reasonably well, but it has a performance problem, which you can see if you run the
+following (where we compare to the final variant):
+
+```{eval = false; tangle = false}
+julia> @btime randomchildnaive($(rand(BoltzmannSampler{5}(1000, 1100))));
+  970.278 μs (3318 allocations: 84.02 KiB)
+  
+julia> @btime randomchild($(rand(BoltzmannSampler{5}(1000, 1100))));
+  25.717 μs (2136 allocations: 66.75 KiB)
+```
+
+In Julia versions below 1.0, this was even more extreme.  The problem is that we recurlively call
+anonymous functions of different type structure, which leads to compilation of extremely nested
+types.  We can see this when we look at an example from the stack trace of an interrupted execution:
+
+```{eval = false; tangle = false}
+[4] randomsplitnaive_impl(::Branch{5}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},typeof(identity)}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87 (repeats 2 times)
+
+```
+
+### Solution ###
+
+To remove these issues
 
 ```julia
 abstract type Context{N} end
@@ -248,8 +333,9 @@ function testvalues(t, N)
     zd = [sumtree(randomchild(t)) for _ in 1:N]
     [(i, sum(zd .== i)) for i in unique(zd)]
 end
-
-testvalues(t, 1000)
 ```
 
+```{julia; tangle = false}
+testvalues(t, 1000)
+```
 
