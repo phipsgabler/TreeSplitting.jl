@@ -245,49 +245,95 @@ anonymous functions of different type structure, which leads to compilation of e
 types.  We can see this when we look at an example from the stack trace of an interrupted execution:
 
 ```{eval = false; tangle = false}
-[4] randomsplitnaive_impl(::Branch{5}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##10#13")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},getfield(Main, Symbol("##9#12")){Branch{5},typeof(identity)}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87 (repeats 2 times)
-
+Stacktrace:
+ [1] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87 (repeats 2 times)
+ [2] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 2 times)
+ [3] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87 (repeats 3 times)
+ [4] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 2 times)
+ [5] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87 (repeats 2 times)
+ [6] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 2 times)
+ [7] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87
+ [8] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91
+ [9] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87
+ [10] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 2 times)
+ [11] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87
+ [12] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 2 times)
+ [13] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87
+ [14] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 2 times)
+ [15] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##9#12")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87 (repeats 2 times)
+ [16] randomsplitnaive_impl(::Branch{50}, ::Int64, ::getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##10#13")){Branch{50},getfield(Main, Symbol("##9#12")){Branch{50},typeof(identity)}}}}, ::Function) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:91 (repeats 4 times)
+ [17] randomsplitnaive_impl(::Branch{50}, ::Int64, ::typeof(identity), ::Nothing) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:87
+ [18] randomsplitnaive(::Function, ::Branch{50}) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:113
+ [19] randomchildnaive(::Branch{50}) at /home/philipp/git/TreeSplitting/src/TreeSplitting.jl:118
+ [20] top-level scope at none:0
 ```
 
 ### Solution ###
 
-To remove these issues
+To remove these issues, we should note that the source of the problem are the “unstable” types of
+the arguments `context` and `continuation` of the `randomsplitnaive_impl` function.  They result in
+being built up of nested closures, for which at every recursion level, a new type is inferred.
+
+To solve this, we should realize that the used anonymous functions are of a very simple and
+repeating structure.  For `context`s, there are the following options:
+
+```{julia; eval = false; tangle = false}
+t -> context(Branch(t, b.right))
+t -> context(Branch(b.left, t))
+```
+
+while `continuation`s always have the structure
+
+```{julia; eval = false; tangle = false}
+k -> (context(k(b)), b)
+```
+
+Looking at these closures, we can factor out the relevant information into their own types:
 
 ```julia
+# Context types:
 abstract type Context{N} end
-
 
 struct LeftContext{N} <: Context{N}
     right::Tree{N}
     parent::Context{N}
 end
 
-function (context::LeftContext{N})(t::Tree{N}) where N
-    context.parent(Branch(t, context.right))
-end
-
-
 struct RightContext{N} <: Context{N}
     left::Tree{N}
     parent::Context{N}
 end
 
+# This will be used instead of `nothing` in the top-level call
+struct NoContext{N} <: Context{N} end
+
+
+# Continuation type:
+struct Cont{N}
+    context::Context{N}
+    chunk::Tree{N}
+end
+
+```
+
+Now we can see that `Context` is actually just a [zipper](https://wiki.haskell.org/Zipper) for the
+`Tree` type. 
+
+Then we just have to overload the calling operators of these types to make them work like the
+anonymous functionsa above:
+
+```julia
+
 function (context::RightContext{N})(t::Tree{N}) where N
     context.parent(Branch(context.left, t))
 end
 
+function (context::LeftContext{N})(t::Tree{N}) where N
+    context.parent(Branch(t, context.right))
+end
 
-struct NoContext{N} <: Context{N} end
-    
 function (context::NoContext{N})(t::Tree{N}) where N
     t
-end
-```
-
-```julia
-struct Cont{N}
-    context::Context{N}
-    chunk::Tree{N}
 end
 
 function (continuation::Cont{N})(k::Function) where N
@@ -296,6 +342,9 @@ function (continuation::Cont{N})(k::Function) where N
     return tree, continuation.chunk
 end
 ```
+
+Given this, it is easy, to rewrite `randomsplitnaive` in a more type-stable form as follows – in
+fact, this it results in simpler code:
 
 ```julia
 function randomsplit_impl(t::Leaf{N}, n::Int, context::Context{N}, continuation::Cont{N}) where {N}
@@ -327,6 +376,8 @@ end
 
 randomchild(t::Tree{N}) where {N} = randomsplit(identity, t)[2]
 ```
+
+Again, we can test whether the random children are distributed about uniformly:
 
 ```julia
 function testvalues(t, N)
